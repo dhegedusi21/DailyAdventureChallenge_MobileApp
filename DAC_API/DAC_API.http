@@ -1,6 +1,6 @@
 @DAC_API_HostAddress = http://localhost:5050
 
-GET {{DAC_API_HostAddress}}/weatherforecast/
+GET {{DAC_API_HostAddress}}/
 Accept: application/json
 
 ###

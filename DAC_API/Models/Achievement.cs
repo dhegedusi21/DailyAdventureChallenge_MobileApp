@@ -9,8 +9,6 @@ public partial class Achievement
 
     public string Name { get; set; } = null!;
 
-    public string? Description { get; set; }
-
     public string Requirements { get; set; } = null!;
 
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();

@@ -42,7 +42,6 @@ public partial class DailyAdventureAppContext : DbContext
             entity.ToTable("Achievement");
 
             entity.Property(e => e.IdAchievement).HasColumnName("idAchievement");
-            entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
