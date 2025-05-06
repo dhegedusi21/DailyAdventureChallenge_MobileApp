@@ -1,5 +1,5 @@
 ﻿using DAC_API.Models;
-using DAC_API.Models.DTO;
+using DAC_API.Models.DTO.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;

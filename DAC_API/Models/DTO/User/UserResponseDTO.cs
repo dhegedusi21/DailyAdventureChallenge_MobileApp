@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DAC_API.Models.DTO {
+namespace DAC_API.Models.DTO.User {
     public class UserResponseDTO {
         public int IdUser { get; set; }
         public string Username { get; set; }
