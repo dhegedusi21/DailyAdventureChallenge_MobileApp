@@ -1,6 +1,7 @@
 ﻿using DAC_API.Models;
 using DAC_API.Models.DTO;
 using DAC_API.Models.DTO.Submission;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -164,6 +165,7 @@ namespace DAC_API.Controllers {
         }
 
         // Creates a new submission
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -230,6 +232,7 @@ namespace DAC_API.Controllers {
         }
 
         // Deletes a submission
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

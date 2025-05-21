@@ -1,5 +1,6 @@
 ﻿using DAC_API.Models;
 using DAC_API.Models.DTO.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -103,6 +104,7 @@ namespace DAC_API.Controllers {
 
 
         // Updates a user
+        [Authorize]
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -151,6 +153,7 @@ namespace DAC_API.Controllers {
         }
 
         // Deletes a user
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

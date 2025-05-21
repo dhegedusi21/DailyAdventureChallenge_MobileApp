@@ -1,6 +1,7 @@
 ﻿using DAC_API.Models;
 using DAC_API.Models.DTO;
 using DAC_API.Models.DTO.Notification;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace DAC_API.Controllers {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NotificationController : ControllerBase {

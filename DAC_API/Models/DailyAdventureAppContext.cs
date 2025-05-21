@@ -158,6 +158,12 @@ public partial class DailyAdventureAppContext : DbContext
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .HasColumnName("username");
+            entity.Property(e => e.RefreshToken)
+                .HasMaxLength(255)
+                .HasColumnName("refresh_token");
+            entity.Property(e => e.RefreshTokenExpiryTime)
+                .HasColumnType("datetime")
+                .HasColumnName("refresh_token_expiry_time");
         });
 
         modelBuilder.Entity<UserAchievement>(entity =>

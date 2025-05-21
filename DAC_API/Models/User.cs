@@ -24,4 +24,9 @@ public partial class User
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 
     public virtual ICollection<Vote> Votes { get; set; } = new List<Vote>();
+
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
+
+
 }
