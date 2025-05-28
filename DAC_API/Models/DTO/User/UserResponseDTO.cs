@@ -7,5 +7,6 @@ namespace DAC_API.Models.DTO.User {
         public string Email { get; set; }
         public string? ProfilePicture { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public int? Points { get; set; }
     }
 }

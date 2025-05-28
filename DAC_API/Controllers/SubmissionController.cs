@@ -40,7 +40,9 @@ namespace DAC_API.Controllers {
                     CreatedAt = s.CreatedAt,
                     Username = s.User.Username,
                     ChallengeDescription = s.Challenge.Description ?? "No description",
-                    VoteCount = s.Votes.Count
+                    PositiveVotes = s.Votes.Count(v => v.VoteStatus == "Positive"),
+                    NegativeVotes = s.Votes.Count(v => v.VoteStatus == "Negative")
+
                 }).ToList();
 
                 return Ok(submissionDtos);
@@ -76,7 +78,8 @@ namespace DAC_API.Controllers {
                     CreatedAt = submission.CreatedAt,
                     Username = submission.User.Username,
                     ChallengeDescription = submission.Challenge.Description ?? "No description",
-                    VoteCount = submission.Votes.Count
+                    PositiveVotes = submission.Votes.Count(v => v.VoteStatus == "Positive"),
+                    NegativeVotes = submission.Votes.Count(v => v.VoteStatus == "Negative")
                 };
 
                 return Ok(submissionDto);
@@ -115,7 +118,9 @@ namespace DAC_API.Controllers {
                     CreatedAt = s.CreatedAt,
                     Username = s.User.Username,
                     ChallengeDescription = s.Challenge.Description ?? "No description",
-                    VoteCount = s.Votes.Count
+                    PositiveVotes = s.Votes.Count(v => v.VoteStatus == "Positive"),
+                    NegativeVotes = s.Votes.Count(v => v.VoteStatus == "Negative")
+
                 }).ToList();
 
                 return Ok(submissionDtos);
@@ -154,7 +159,9 @@ namespace DAC_API.Controllers {
                     CreatedAt = s.CreatedAt,
                     Username = s.User.Username,
                     ChallengeDescription = s.Challenge.Description ?? "No description",
-                    VoteCount = s.Votes.Count
+                    PositiveVotes = s.Votes.Count(v => v.VoteStatus == "Positive"),
+                    NegativeVotes = s.Votes.Count(v => v.VoteStatus == "Negative")
+
                 }).ToList();
 
                 return Ok(submissionDtos);
@@ -203,6 +210,18 @@ namespace DAC_API.Controllers {
                 };
 
                 _context.Submissions.Add(submission);
+
+                // Update UserChallenge status to "Completed"
+                var userChallenge = await _context.UserChallenges
+                    .FirstOrDefaultAsync(uc => uc.UserId == createSubmissionDto.UserId &&
+                                              uc.ChallengeId == createSubmissionDto.ChallengeId &&
+                                              uc.CompletionStatus == "Active");
+
+                if (userChallenge != null) {
+                    userChallenge.CompletionStatus = "Completed";
+                    _context.Entry(userChallenge).State = EntityState.Modified;
+                }
+
                 await _context.SaveChangesAsync();
 
                 var createdSubmission = await _context.Submissions
@@ -219,7 +238,9 @@ namespace DAC_API.Controllers {
                     CreatedAt = createdSubmission.CreatedAt,
                     Username = createdSubmission.User.Username,
                     ChallengeDescription = createdSubmission.Challenge.Description ?? "No description",
-                    VoteCount = 0
+                    PositiveVotes = 0,
+                    NegativeVotes = 0
+
                 };
 
                 return CreatedAtAction(nameof(GetSubmissionById),

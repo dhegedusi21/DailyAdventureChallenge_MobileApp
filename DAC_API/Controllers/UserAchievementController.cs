@@ -1,6 +1,7 @@
 ﻿using DAC_API.Models;
 using DAC_API.Models.DTO;
 using DAC_API.Models.DTO.UserAchievement;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -148,6 +149,7 @@ namespace DAC_API.Controllers {
         }
 
         // Awards an achievement to a user
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

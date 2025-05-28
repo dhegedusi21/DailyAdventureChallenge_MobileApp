@@ -1,6 +1,7 @@
 ﻿using DAC_API.Models;
 using DAC_API.Models.DTO;
 using DAC_API.Models.DTO.Vote;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -150,38 +151,6 @@ namespace DAC_API.Controllers {
             }
         }
 
-        // Gets the count of upvotes and downvotes for a submission
-        [HttpGet("submission/{submissionId}/count")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<object>> GetVoteCountForSubmission(int submissionId) {
-            try {
-                var submissionExists = await _context.Submissions.AnyAsync(s => s.IdSubmission == submissionId);
-                if (!submissionExists) {
-                    return NotFound($"Submission with ID {submissionId} not found");
-                }
-
-                var votes = await _context.Votes
-                    .Where(v => v.SubmissionId == submissionId)
-                    .ToListAsync();
-
-                int upvotes = votes.Count(v => v.VoteStatus == "Upvote");
-                int downvotes = votes.Count(v => v.VoteStatus == "Downvote");
-                int total = upvotes - downvotes;
-
-                return Ok(new {
-                    SubmissionId = submissionId,
-                    Upvotes = upvotes,
-                    Downvotes = downvotes,
-                    Total = total
-                });
-            } catch (Exception ex) {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving vote count: " + ex.Message);
-            }
-        }
-
         // Checks if a user has voted on a specific submission
         [HttpGet("user/{userId}/submission/{submissionId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -216,6 +185,7 @@ namespace DAC_API.Controllers {
         }
 
         // Creates a new vote or updates an existing one
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -224,6 +194,10 @@ namespace DAC_API.Controllers {
         public async Task<ActionResult<VoteResponseDTO>> CreateOrUpdateVote(CreateVoteDTO createVoteDto) {
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
+            }
+            var authenticatedUserId = GetUserIdFromJWT();
+            if (authenticatedUserId != createVoteDto.UserId) {
+                return Forbid("You can only vote as yourself");
             }
 
             try {
@@ -295,7 +269,7 @@ namespace DAC_API.Controllers {
                 var notification = new Notification {
                     UserId = submission.UserId,
                     Name = "New Vote",
-                    Message = $"{user.Username} {createVoteDto.VoteStatus.ToLower()}d your submission",
+                    Message = $"{user.Username} {(createVoteDto.VoteStatus == "Positive" ? "liked" : "disliked")} your submission",
                     Type = "Vote",
                     IsRead = false,
                     CreatedAt = DateTime.Now
@@ -350,6 +324,10 @@ namespace DAC_API.Controllers {
         // Helper methods
         private bool VoteExists(int id) {
             return _context.Votes.Any(e => e.IdVote == id);
+        }
+        private int GetUserIdFromJWT() {
+            var userIdClaim = User.FindFirst("userId")?.Value;
+            return int.Parse(userIdClaim ?? "0");
         }
     }
 }

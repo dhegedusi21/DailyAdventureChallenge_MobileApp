@@ -11,6 +11,7 @@ namespace DAC_API.Models.DTO.Submission {
 
         public string Username { get; set; }
         public string ChallengeDescription { get; set; }
-        public int VoteCount { get; set; }
+        public int PositiveVotes { get; set; }
+        public int NegativeVotes { get; set; }
     }
 }

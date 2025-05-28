@@ -40,8 +40,6 @@ namespace DAC_API.Controllers {
                     });
                 }
 
-                // In a real app, you should hash passwords and compare hashes
-                // This is a simplified version for demonstration
                 if (user.Password != model.Password) {
                     return Unauthorized(new AuthResponseDTO {
                         IsSuccess = false,
@@ -54,7 +52,6 @@ namespace DAC_API.Controllers {
                 var tokenExpiryTime = DateTime.Now.AddMinutes(
                     Convert.ToDouble(_configuration["JWT:TokenValidityInMinutes"]));
 
-                // Save refresh token to database - adjusted for nullable fields
                 user.RefreshToken = refreshToken;
                 user.RefreshTokenExpiryTime = DateTime.Now.AddDays(
                     Convert.ToDouble(_configuration["JWT:RefreshTokenValidityInDays"]));
@@ -94,7 +91,6 @@ namespace DAC_API.Controllers {
             }
 
             try {
-                // Check if email already exists
                 var emailExists = await _context.Users.AnyAsync(u => u.Email == model.Email);
                 if (emailExists) {
                     return BadRequest(new AuthResponseDTO {
@@ -103,7 +99,6 @@ namespace DAC_API.Controllers {
                     });
                 }
 
-                // Check if username already exists
                 var usernameExists = await _context.Users.AnyAsync(u => u.Username == model.Username);
                 if (usernameExists) {
                     return BadRequest(new AuthResponseDTO {
@@ -112,14 +107,12 @@ namespace DAC_API.Controllers {
                     });
                 }
 
-                // In a real app, you should hash the password before storing
                 var user = new User {
                     Username = model.Username,
                     Email = model.Email,
-                    Password = model.Password, // Should be hashed in production
+                    Password = model.Password,
                     ProfilePicture = model.ProfilePicture,
                     CreatedAt = DateTime.Now
-                    // RefreshToken and RefreshTokenExpiryTime are nullable, so no need to set them here
                 };
 
                 _context.Users.Add(user);
@@ -130,7 +123,6 @@ namespace DAC_API.Controllers {
                 var tokenExpiryTime = DateTime.Now.AddMinutes(
                     Convert.ToDouble(_configuration["JWT:TokenValidityInMinutes"]));
 
-                // Save refresh token to database - adjusted for nullable fields
                 user.RefreshToken = refreshToken;
                 user.RefreshTokenExpiryTime = DateTime.Now.AddDays(
                     Convert.ToDouble(_configuration["JWT:RefreshTokenValidityInDays"]));
@@ -266,8 +258,4 @@ namespace DAC_API.Controllers {
         }
     }
 
-    public class TokenModel {
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-    }
 }

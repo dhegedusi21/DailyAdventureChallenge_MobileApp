@@ -28,6 +28,9 @@ public partial class DailyAdventureAppContext : DbContext
     public virtual DbSet<UserAchievement> UserAchievements { get; set; }
 
     public virtual DbSet<Vote> Votes { get; set; }
+    public virtual DbSet<UserChallenge> UserChallenges { get; set; }
+
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -158,6 +161,9 @@ public partial class DailyAdventureAppContext : DbContext
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .HasColumnName("username");
+            entity.Property(e => e.Points)
+                .HasDefaultValue(0)
+                .HasColumnName("points");
             entity.Property(e => e.RefreshToken)
                 .HasMaxLength(255)
                 .HasColumnName("refresh_token");
@@ -224,6 +230,36 @@ public partial class DailyAdventureAppContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Vote__user_id__48CFD27E");
+        });
+        modelBuilder.Entity<UserChallenge>(entity =>
+        {
+            entity.HasKey(e => e.IdUserChallenge).HasName("PK__UserChal__3214EC07");
+
+            entity.ToTable("UserChallenge");
+
+            entity.HasIndex(e => e.UserId, "idx_UserChallenge_User");
+            entity.HasIndex(e => e.ChallengeId, "idx_UserChallenge_Challenge");
+
+            entity.Property(e => e.IdUserChallenge).HasColumnName("idUserChallenge");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ChallengeId).HasColumnName("challenge_id");
+            entity.Property(e => e.AssignedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("assigned_date");
+            entity.Property(e => e.CompletionStatus)
+                .HasMaxLength(20)
+                .HasDefaultValue("Active")
+                .HasColumnName("completion_status");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserChall__user___5CD6CB2B");
+
+            entity.HasOne(d => d.Challenge).WithMany()
+                .HasForeignKey(d => d.ChallengeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__UserChall__chall___5DCAEF64");
         });
 
         OnModelCreatingPartial(modelBuilder);

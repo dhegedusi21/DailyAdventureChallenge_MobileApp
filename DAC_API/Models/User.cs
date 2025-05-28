@@ -6,15 +6,11 @@ namespace DAC_API.Models;
 public partial class User
 {
     public int IdUser { get; set; }
-
     public string Username { get; set; } = null!;
-
     public string Email { get; set; } = null!;
-
     public string Password { get; set; } = null!;
-
     public string? ProfilePicture { get; set; }
-
+    public int? Points { get; set; }
     public DateTime? CreatedAt { get; set; }
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
