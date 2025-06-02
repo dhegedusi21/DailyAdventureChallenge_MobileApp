@@ -299,6 +299,7 @@ namespace DAC_API.Controllers {
         }
 
         // Deletes a vote
+        [Authorize]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
