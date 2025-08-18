@@ -1,0 +1,370 @@
+﻿using DAC_API.Models;
+using DAC_API.Models.DTO;
+using DAC_API.Models.DTO.Vote;
+using FirebaseAdmin.Messaging;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+
+namespace DAC_API.Controllers {
+    [ApiController]
+    [Route("api/[controller]")]
+    public class VoteController : ControllerBase {
+        private readonly DailyAdventureAppContext _context;
+        private readonly ILogger<VoteController> _logger;
+
+        public VoteController(DailyAdventureAppContext context, ILogger<VoteController> logger) {
+            _context = context;
+            _logger = logger;
+
+        }
+
+        // Gets all votes
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<VoteResponseDTO>>> GetAllVotes() {
+            try {
+                var votes = await _context.Votes
+                    .Include(v => v.User)
+                    .Include(v => v.Submission)
+                    .ToListAsync();
+
+                var voteDtos = votes.Select(v => new VoteResponseDTO {
+                    IdVote = v.IdVote,
+                    SubmissionId = v.SubmissionId,
+                    UserId = v.UserId,
+                    VoteStatus = v.VoteStatus,
+                    CreatedAt = v.CreatedAt,
+                    Username = v.User.Username,
+                    SubmissionPhotoUrl = v.Submission.PhotoUrl
+                }).ToList();
+
+                return Ok(voteDtos);
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving votes: " + ex.Message);
+            }
+        }
+
+        // Gets a vote by ID
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<VoteResponseDTO>> GetVoteById(int id) {
+            try {
+                var vote = await _context.Votes
+                    .Include(v => v.User)
+                    .Include(v => v.Submission)
+                    .FirstOrDefaultAsync(v => v.IdVote == id);
+
+                if (vote == null) {
+                    return NotFound($"Vote with ID {id} not found");
+                }
+
+                var voteDto = new VoteResponseDTO {
+                    IdVote = vote.IdVote,
+                    SubmissionId = vote.SubmissionId,
+                    UserId = vote.UserId,
+                    VoteStatus = vote.VoteStatus,
+                    CreatedAt = vote.CreatedAt,
+                    Username = vote.User.Username,
+                    SubmissionPhotoUrl = vote.Submission.PhotoUrl
+                };
+
+                return Ok(voteDto);
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving vote: " + ex.Message);
+            }
+        }
+
+        // Gets all votes for a specific submission
+        [HttpGet("submission/{submissionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<VoteResponseDTO>>> GetVotesBySubmission(int submissionId) {
+            try {
+                var submissionExists = await _context.Submissions.AnyAsync(s => s.IdSubmission == submissionId);
+                if (!submissionExists) {
+                    return NotFound($"Submission with ID {submissionId} not found");
+                }
+
+                var votes = await _context.Votes
+                    .Include(v => v.User)
+                    .Include(v => v.Submission)
+                    .Where(v => v.SubmissionId == submissionId)
+                    .ToListAsync();
+
+                var voteDtos = votes.Select(v => new VoteResponseDTO {
+                    IdVote = v.IdVote,
+                    SubmissionId = v.SubmissionId,
+                    UserId = v.UserId,
+                    VoteStatus = v.VoteStatus,
+                    CreatedAt = v.CreatedAt,
+                    Username = v.User.Username,
+                    SubmissionPhotoUrl = v.Submission.PhotoUrl
+                }).ToList();
+
+                return Ok(voteDtos);
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving votes: " + ex.Message);
+            }
+        }
+
+        // Gets all votes by a specific user
+        [HttpGet("user/{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<VoteResponseDTO>>> GetVotesByUser(int userId) {
+            try {
+                var userExists = await _context.Users.AnyAsync(u => u.IdUser == userId);
+                if (!userExists) {
+                    return NotFound($"User with ID {userId} not found");
+                }
+
+                var votes = await _context.Votes
+                    .Include(v => v.User)
+                    .Include(v => v.Submission)
+                    .Where(v => v.UserId == userId)
+                    .ToListAsync();
+
+                var voteDtos = votes.Select(v => new VoteResponseDTO {
+                    IdVote = v.IdVote,
+                    SubmissionId = v.SubmissionId,
+                    UserId = v.UserId,
+                    VoteStatus = v.VoteStatus,
+                    CreatedAt = v.CreatedAt,
+                    Username = v.User.Username,
+                    SubmissionPhotoUrl = v.Submission.PhotoUrl
+                }).ToList();
+
+                return Ok(voteDtos);
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving votes: " + ex.Message);
+            }
+        }
+
+        // Checks if a user has voted on a specific submission
+        [HttpGet("user/{userId}/submission/{submissionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<VoteResponseDTO>> GetUserVoteForSubmission(int userId, int submissionId) {
+            try {
+                var vote = await _context.Votes
+                    .Include(v => v.User)
+                    .Include(v => v.Submission)
+                    .FirstOrDefaultAsync(v => v.UserId == userId && v.SubmissionId == submissionId);
+
+                if (vote == null) {
+                    return NotFound($"No vote found for user {userId} on submission {submissionId}");
+                }
+
+                var voteDto = new VoteResponseDTO {
+                    IdVote = vote.IdVote,
+                    SubmissionId = vote.SubmissionId,
+                    UserId = vote.UserId,
+                    VoteStatus = vote.VoteStatus,
+                    CreatedAt = vote.CreatedAt,
+                    Username = vote.User.Username,
+                    SubmissionPhotoUrl = vote.Submission.PhotoUrl
+                };
+
+                return Ok(voteDto);
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving vote: " + ex.Message);
+            }
+        }
+
+        // Creates a new vote or updates an existing one
+        [Authorize]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<VoteResponseDTO>> CreateOrUpdateVote(CreateVoteDTO createVoteDto) {
+            if (!ModelState.IsValid) {
+                return BadRequest(ModelState);
+            }
+            var authenticatedUserId = GetUserIdFromJWT();
+            if (authenticatedUserId != createVoteDto.UserId) {
+                return StatusCode(StatusCodes.Status403Forbidden, "You can only vote as yourself. Mismatch between token user ID and request user ID.");
+            }
+
+            try {
+                var user = await _context.Users.FindAsync(createVoteDto.UserId);
+                if (user == null) {
+                    return BadRequest($"User with ID {createVoteDto.UserId} not found");
+                }
+
+                var submission = await _context.Submissions
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.IdSubmission == createVoteDto.SubmissionId);
+
+                if (submission == null) {
+                    return BadRequest($"Submission with ID {createVoteDto.SubmissionId} not found");
+                }
+
+                if (submission.UserId == createVoteDto.UserId) {
+                    return BadRequest("You cannot vote on your own submission");
+                }
+
+                var existingVote = await _context.Votes
+                    .FirstOrDefaultAsync(v => v.UserId == createVoteDto.UserId &&
+                                             v.SubmissionId == createVoteDto.SubmissionId);
+
+                VoteResponseDTO voteResponseDto;
+
+                if (existingVote != null) {
+                    if (existingVote.VoteStatus != createVoteDto.VoteStatus) {
+                        existingVote.VoteStatus = createVoteDto.VoteStatus;
+                        existingVote.CreatedAt = DateTime.Now;
+
+                        _context.Entry(existingVote).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+
+                        voteResponseDto = new VoteResponseDTO {
+                            IdVote = existingVote.IdVote,
+                            SubmissionId = existingVote.SubmissionId,
+                            UserId = existingVote.UserId,
+                            VoteStatus = existingVote.VoteStatus,
+                            CreatedAt = existingVote.CreatedAt,
+                            Username = user.Username,
+                            SubmissionPhotoUrl = submission.PhotoUrl
+                        };
+                    } else {
+                        voteResponseDto = new VoteResponseDTO {
+                            IdVote = existingVote.IdVote,
+                            SubmissionId = existingVote.SubmissionId,
+                            UserId = existingVote.UserId,
+                            VoteStatus = existingVote.VoteStatus,
+                            CreatedAt = existingVote.CreatedAt,
+                            Username = user.Username,
+                            SubmissionPhotoUrl = submission.PhotoUrl
+                        };
+                    }
+                } else {
+                    var vote = new Vote {
+                        SubmissionId = createVoteDto.SubmissionId,
+                        UserId = createVoteDto.UserId,
+                        VoteStatus = createVoteDto.VoteStatus,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    _context.Votes.Add(vote);
+                    await _context.SaveChangesAsync();
+
+                    var notification = new Models.Notification {
+                        UserId = submission.UserId,
+                        Name = "New Vote",
+                        Message = $"{user.Username} {(createVoteDto.VoteStatus == "Positive" ? "liked" : "disliked")} your submission",
+                        Type = "Vote",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    _context.Notifications.Add(notification);
+                    await _context.SaveChangesAsync();
+
+                    voteResponseDto = new VoteResponseDTO {
+                        IdVote = vote.IdVote,
+                        SubmissionId = vote.SubmissionId,
+                        UserId = vote.UserId,
+                        VoteStatus = vote.VoteStatus,
+                        CreatedAt = vote.CreatedAt,
+                        Username = user.Username,
+                        SubmissionPhotoUrl = submission.PhotoUrl
+                    };
+                }
+
+                if (submission.User.FcmToken != null) {
+                    
+                    var notificationTitle = "New Vote!";
+                    var notificationBody = $"{user.Username} voted on your submission.";
+
+                    var message = new Message {
+                        Token = submission.User.FcmToken,
+                        Notification = new FirebaseAdmin.Messaging.Notification {
+                            Title = notificationTitle,
+                            Body = notificationBody
+                        },
+                        Data = new Dictionary<string, string>
+                        {
+                            { "submissionId", submission.IdSubmission.ToString() },
+                            { "voteStatus", createVoteDto.VoteStatus }
+                        }
+                    };
+                    
+                    try {
+                        var response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                        
+                    } catch (Exception ex) {
+                        _logger.LogError($"Error sending FCM message: {ex.Message}");
+                    }
+                }
+
+                return CreatedAtAction(
+                    nameof(GetVoteById),
+                    new { id = voteResponseDto.IdVote },
+                    voteResponseDto);
+
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error creating vote: " + ex.Message);
+            }
+        }
+
+
+        // Deletes a vote
+        [Authorize]
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteVote(int id) {
+            try {
+                var vote = await _context.Votes.FindAsync(id);
+
+                if (vote == null) {
+                    return NotFound($"Vote with ID {id} not found");
+                }
+
+                _context.Votes.Remove(vote);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            } catch (Exception ex) {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting vote: " + ex.Message);
+            }
+        }
+
+        // Helper methods
+        private bool VoteExists(int id) {
+            return _context.Votes.Any(e => e.IdVote == id);
+        }
+        private int GetUserIdFromJWT() {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
+            if (int.TryParse(userIdClaim, out int userId)) {
+                return userId;
+            }
+            return 0;
+        }
+    }
+}
+

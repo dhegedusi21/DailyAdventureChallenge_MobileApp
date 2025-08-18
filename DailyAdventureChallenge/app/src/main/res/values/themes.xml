@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.DailyAdventureChallenge" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/purple_primary</item>
+        <item name="colorSecondary">@color/teal_accent</item>
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="android:statusBarColor">@color/dark_background</item>
+    </style>
+</resources>

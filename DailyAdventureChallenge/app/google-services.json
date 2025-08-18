@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "153034456703",
+    "project_id": "dailyadventurechallenge",
+    "storage_bucket": "dailyadventurechallenge.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153034456703:android:0405b44cb8b55eb489894a",
+        "android_client_info": {
+          "package_name": "com.example.dailyadventurechallenge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIO92UwqFl_aoPhnTpGMXFAwVeodIPkKw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

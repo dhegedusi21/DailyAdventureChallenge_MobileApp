@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DailyAdventureChallenge</string>
+    <string name="app_logo">App Logo</string>
+    <string name="default_notification_channel_id" translatable="false">daily_adventure_channel</string>
+    <string name="default_notification_channel_name">Daily Adventures</string>
+
+</resources>

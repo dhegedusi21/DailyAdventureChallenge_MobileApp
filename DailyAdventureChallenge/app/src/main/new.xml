@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:padding="16dp" tools:context=".MainActivity">//
+    Corrected context if MainActivity is in root package
+
+    <TextView android:id="@+id/tvGreeting" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textSize="24sp"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" tools:text="Hello, Adventurer!" />
+
+    <androidx.cardview.widget.CardView android:id="@+id/cardChallenge" android:layout_width="0dp"
+        android:layout_height="wrap_content" android:layout_marginTop="24dp" app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvGreeting"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <TextView android:id="@+id/tvChallengeTitle" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="Today's Challenge:"
+                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+            <TextView android:id="@+id/tvChallengeDescription" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:textAppearance="?attr/textAppearanceBody1"
+                tools:text="Description of the challenge goes here." />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:orientation="horizontal">
+
+                <TextView android:id="@+id/tvChallengeDifficulty" android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    tools:text="Difficulty: Hard" />
+
+                <TextView android:id="@+id/tvChallengePoints" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBody2" tools:text="Points: 100" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView android:id="@+id/tvError" android:layout_width="0dp"
+        android:layout_height="wrap_content" android:layout_marginTop="16dp"
+        android:textColor="@android:color/holo_red_dark" android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cardChallenge"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Error loading challenge." tools:visibility="visible" />
+
+    <Button android:id="@+id/btnRetry" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Retry"
+        android:visibility="gone" app:layout_constraintTop_toBottomOf="@id/tvError"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
+    <Button android:id="@+id/btnLogout" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="Logout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="32dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
