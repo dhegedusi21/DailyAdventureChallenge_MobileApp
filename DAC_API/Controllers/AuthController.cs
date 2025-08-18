@@ -173,7 +173,6 @@ namespace DAC_API.Controllers {
 
             var user = await _context.Users.FindAsync(int.Parse(userId));
 
-            // Check if user exists and has a valid refresh token
             if (user == null || user.RefreshToken != refreshToken || !user.RefreshTokenExpiryTime.HasValue || user.RefreshTokenExpiryTime.Value <= DateTime.Now) {
                 return BadRequest("Invalid access token or refresh token");
             }

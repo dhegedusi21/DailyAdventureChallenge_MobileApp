@@ -24,7 +24,6 @@ builder.Services.AddSwaggerGen(c => {
         Scheme = "Bearer"
     });
 
-    // Require JWT token for all endpoints (except those marked with [AllowAnonymous])
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
