@@ -34,8 +34,11 @@
             android:name=".SubmitEvidenceActivity"
             android:exported="false" />
         <activity
-        android:name=".NewsFeedActivity"
-        android:exported="false" />
+            android:name=".NewsFeedActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegistrationActivity"
+            android:exported="false" />
 
         <service
         android:name=".services.MyFirebaseMessagingService"

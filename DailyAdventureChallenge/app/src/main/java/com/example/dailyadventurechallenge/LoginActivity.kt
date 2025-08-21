@@ -91,12 +91,10 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<TextView>(R.id.tvForgotPassword).setOnClickListener {
-            Toast.makeText(this, "Forgot password clicked", Toast.LENGTH_SHORT).show()
-        }
 
         findViewById<TextView>(R.id.tvSignUp).setOnClickListener {
-            Toast.makeText(this, "Sign up clicked", Toast.LENGTH_SHORT).show()
+            val intent = RegistrationActivity.newIntent(this)
+            startActivity(intent)
         }
     }
 

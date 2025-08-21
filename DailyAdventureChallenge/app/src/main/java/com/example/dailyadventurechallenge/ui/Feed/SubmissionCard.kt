@@ -118,38 +118,5 @@ fun SubmissionCard(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SubmissionCardPreview() {
-    val mockSubmission = SubmissionItem(
-        idSubmission = 1, userId = 1, challengeId = 1, photoUrl = "https://res.cloudinary.com/dsjbcxz6i/image/upload/v1755026350/submissions/submission_3_7cd52737-8709-4e70-87b9-ed21f73d8fcc.jpg",
-        status = "Pending", createdAt = "2023-01-01T12:00:00Z", username = "User1",
-        challengeDescription = "Climb a really tall tree and take a photo from the top!",
-        positiveVotes = 10, negativeVotes = 2, currentUserVoteStatus = "Positive"
-    )
-    DailyAdventureChallengeTheme {
-        SubmissionCard(
-            submission = mockSubmission,
-            onVote = { _, _ ->  },
-            currentUserId = 2
-        )
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun SubmissionCardNoVotePreview() {
-    val mockSubmission = SubmissionItem(
-        idSubmission = 1, userId = 1, challengeId = 1, photoUrl = null,
-        status = "Pending", createdAt = "2023-01-01T12:00:00Z", username = "AnotherUser",
-        challengeDescription = "Bake a cake blindfolded.",
-        positiveVotes = 5, negativeVotes = 1, currentUserVoteStatus = null
-    )
-    DailyAdventureChallengeTheme {
-        SubmissionCard(
-            submission = mockSubmission,
-            onVote = { _, _ ->  },
-            currentUserId = 2
-        )
-    }
-}
+

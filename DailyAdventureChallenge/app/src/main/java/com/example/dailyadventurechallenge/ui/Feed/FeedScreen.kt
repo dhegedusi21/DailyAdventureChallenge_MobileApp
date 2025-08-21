@@ -95,16 +95,4 @@ fun FeedScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun FeedScreenPreview() {
-    DailyAdventureChallengeTheme {
-        val mockSubmission = SubmissionItem(
-            idSubmission = 1, userId = 1, challengeId = 1, photoUrl = null,
-            status = "Pending", createdAt = "2023-01-01T12:00:00Z", username = "User1",
-            challengeDescription = "A great challenge", positiveVotes = 10, negativeVotes = 2,
-            currentUserVoteStatus = "Positive"
-        )
-        Text("Feed Screen Preview (requires ViewModel)")
-    }
-}
+

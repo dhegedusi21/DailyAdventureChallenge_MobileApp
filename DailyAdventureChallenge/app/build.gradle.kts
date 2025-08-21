@@ -66,6 +66,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.8.3")
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.android.gms:play-services-games-v2:21.0.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

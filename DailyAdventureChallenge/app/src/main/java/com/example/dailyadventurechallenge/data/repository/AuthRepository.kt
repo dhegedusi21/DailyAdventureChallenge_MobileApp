@@ -1,9 +1,11 @@
 package com.example.dailyadventurechallenge.data.repository
 
 import com.example.dailyadventurechallenge.data.api.ApiService
+import com.example.dailyadventurechallenge.data.api.RetrofitClient.apiService
 import com.example.dailyadventurechallenge.data.dto.Authentication.AuthResponseDTO
 import com.example.dailyadventurechallenge.data.dto.Authentication.LoginDTO
 import com.example.dailyadventurechallenge.data.dto.Authentication.TokenModel
+import com.example.dailyadventurechallenge.data.dto.User.CreateUserDTO
 import com.google.gson.Gson
 import retrofit2.HttpException
 import java.io.IOException
@@ -51,10 +53,51 @@ class AuthRepository(private val apiService: ApiService) {
         } catch (e: IOException) {
             Result.Error(Exception("Login network connection error. Please check your internet.", e))
         } catch (e: Exception) {
-            Result.Error(Exception("An unexpected error occurred during login: ${e.message}", e))
+            Result.Error(Exception("An unexpected error occurred: ${e.message}", e))
         }
     }
+    suspend fun registerUser(createUserRequest: CreateUserDTO): Result<AuthResponseDTO> {
+        return try {
+            val httpResponse: retrofit2.Response<AuthResponseDTO> = apiService.register(createUserRequest)
 
+            if (httpResponse.isSuccessful) {
+                val authResponse: AuthResponseDTO? = httpResponse.body()
+                if (authResponse != null) {
+                    if (authResponse.isSuccess) {
+                        Result.Success(authResponse)
+                    } else {
+                        Result.Error(Exception(authResponse.message ?: "Registration failed due to server error"))
+                    }
+                } else {
+                    Result.Error(Exception("Empty response body from server"))
+                }
+            } else {
+                val errorBody = httpResponse.errorBody()?.string()
+                val errorMessage = if (!errorBody.isNullOrBlank()) {
+                    try {
+                        val errorDto = gson.fromJson(errorBody, ErrorResponse::class.java) // Using your existing ErrorResponse
+                        errorDto.message ?: "Registration failed with code: ${httpResponse.code()} ${httpResponse.message()}"
+                    } catch (e: Exception) {
+                        try {
+                            val authErrorDto = gson.fromJson(errorBody, AuthResponseDTO::class.java)
+                            authErrorDto.message ?: "Registration failed with code: ${httpResponse.code()} (raw error: $errorBody)"
+                        } catch (e2: Exception) {
+                            "Registration failed with code: ${httpResponse.code()} (raw error: $errorBody)"
+                        }
+                    }
+                } else {
+                    "Registration failed with code: ${httpResponse.code()} ${httpResponse.message()}"
+                }
+                Result.Error(Exception(errorMessage))
+            }
+        } catch (e: HttpException) {
+            Result.Error(Exception("Registration network request failed: ${e.message()}", e))
+        } catch (e: IOException) {
+            Result.Error(Exception("Registration network connection error. Please check your internet.", e))
+        } catch (e: Exception) {
+            Result.Error(Exception("An unexpected error occurred during registration: ${e.message}", e))
+        }
+    }
     suspend fun refreshToken(accessToken: String, refreshToken: String): Result<AuthResponseDTO> {
         return try {
             val tokenModel = TokenModel(accessToken, refreshToken)

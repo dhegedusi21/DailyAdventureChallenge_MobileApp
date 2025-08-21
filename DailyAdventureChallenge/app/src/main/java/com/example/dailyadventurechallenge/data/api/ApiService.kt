@@ -14,7 +14,9 @@ import com.example.dailyadventurechallenge.data.dto.User.UserResponseDTO
 import com.example.dailyadventurechallenge.data.dto.Feed.SubmissionItem
 import com.example.dailyadventurechallenge.data.dto.Feed.CreateVoteRequest
 import com.example.dailyadventurechallenge.data.dto.Feed.VoteResponse
+import com.example.dailyadventurechallenge.data.dto.User.CreateUserDTO
 import com.example.dailyadventurechallenge.data.dto.User.FcmTokenRequest
+import com.google.android.gms.games.gamessignin.AuthResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -33,6 +35,9 @@ interface ApiService {
 
     @POST("api/Auth/refresh-token")
     suspend fun refreshToken(@Body tokenModel: TokenModel): Response<AuthResponseDTO>
+
+    @POST("api/Auth/register")
+    suspend fun register(@Body createUserRequest: CreateUserDTO): Response<AuthResponseDTO>
 
 
     // User
