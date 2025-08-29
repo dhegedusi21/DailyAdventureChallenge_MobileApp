@@ -70,8 +70,10 @@ builder.Services.AddCors(options => {
         });
 });
 
+var basePath = AppContext.BaseDirectory;
+var filePath = Path.Combine(basePath, "dailyadventurechallenge-5701d6b1fb84.json");
 FirebaseApp.Create(new AppOptions {
-Credential = GoogleCredential.FromFile("/Users/Domagoj/source/repos/DailyAdventureChallenge_MobileApp/DAC_API/dailyadventurechallenge-5701d6b1fb84.json")
+    Credential = GoogleCredential.FromFile(filePath)
 });
 
 var app = builder.Build();
